@@ -1,29 +1,45 @@
 export interface Product {
   id: number;
-  productImage: string;
-  productSmallImages: Array<string>;
-  logoImage: string;
-  brand: string;
-  price: number;
-  quantitySold: number;
-  rating: number;
-  title: string;
-}
-
-export interface ProductData {
-  id: number;
+  images: Array<string>;
   name: string;
-  image: string;
-  type: string;
+  description: string;
   price: number;
+  selled: number;
   countInStock: number;
   rating: number;
-  description: string;
-  discount: number;
-  selled: number;
+  type: string
 }
 
-export interface OrderProduct extends ProductData {
+export interface OrderProduct extends Product {
   amount: number;
   selected: boolean;
+}
+
+export interface OrderItem {
+  productId: number;
+  amount: number;
+  price: number;
+  discount: number;
+  image: string;
+}
+
+export interface Order {
+  orderItems: Array<OrderItem>;
+  paymentMethod: string;
+  deliveryMethod: string;
+  itemsPrice: number;
+  shippingPrice: number;
+  totalPrice: number;
+  isPaid: boolean;
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+}
+
+export interface Type {
+  id: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
 }

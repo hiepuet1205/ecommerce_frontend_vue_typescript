@@ -2,7 +2,7 @@
   <BaseAdminPage>
     <template v-slot:content>
       <h1 class="text-2xl font-bold">Quản lý người dùng</h1>
-      <button class="border-2 border-inherit p-16 mt-5" @click="adminStore.setShowModal(true)">
+      <button class="border-2 border-inherit p-16 mt-5" @click="globalStore.setShowModal(true)">
         <font-awesome-icon :icon="['fas', 'plus']" class="text-9xl" />
       </button>
       <table class="w-full block whitespace-no-wrap overflow-x-scroll table-striped mt-5">
@@ -73,11 +73,11 @@
       </div>
       <div
         class="rounded-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  z-20 mx-auto my-0 bg-white w-2/5"
-        v-if="adminStore.getIsShowModal">
+        v-if="globalStore.getIsShowModal">
         <div class="border-b-2 border-slate-400 p-8 relative">
           <h1 class="text-xl font-bold">{{ modalTitle }}</h1>
           <button class="absolute top-3 right-4 text-4xl text-slate-600"
-            @click="adminStore.setShowModal(false)">x</button>
+            @click="globalStore.setShowModal(false)">x</button>
         </div>
         <div class="px-8 pt-8 pb-20">
           <label>Name</label>
@@ -124,7 +124,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useAdminStore } from '../../../store/admin';
+import { useGlobalStore } from '../../../store/global';
 import BaseAdminPage from '../BaseAdminPage.vue';
 import { User } from '../../../types/User';
 import { useRouter } from 'vue-router';
@@ -165,7 +165,7 @@ const handleClickSeeMore = async () => {
   }
 }
 
-const adminStore = useAdminStore();
+const globalStore = useGlobalStore();
 
 const id = ref<number>(0)
 const name = ref<string | undefined>("")
@@ -225,7 +225,7 @@ const handleClickDelete = async (id: number) => {
 
 const handleClickUpdate = async (user: User) => {
   isUpdate.value = true
-  adminStore.setShowModal(true)
+  globalStore.setShowModal(true)
 
   id.value = user.id
   name.value = user.name
@@ -244,4 +244,4 @@ const handleClickUpdate = async (user: User) => {
 .input:focus {
   border-bottom: solid 2px rgb(32, 48, 128);
 }
-</style>
+</style>../../../store/global

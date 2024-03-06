@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
-import {} from "pinia-plugin-persistedstate";
+import { } from "pinia-plugin-persistedstate";
 
 export const useAuthStore = defineStore({
   id: 'auth-store',
   state: () => {
     return {
       token: '',
-      isAuthenticated: false
+      isAuthenticated: false,
+      isAdmin: false
     }
   },
   actions: {
@@ -15,13 +16,18 @@ export const useAuthStore = defineStore({
       this.isAuthenticated = true;
     },
     logoutHandle() {
-      this.token = ''
-      this.isAuthenticated = false
+      this.token = '';
+      this.isAuthenticated = false;
+      this.isAdmin = false;
+    },
+    setIsAdmin(isAdmin: boolean) {
+      this.isAdmin = isAdmin;
     }
   },
   getters: {
     getToken: state => state.token,
-    getIsAuthenticated: state => state.isAuthenticated
+    getIsAuthenticated: state => state.isAuthenticated,
+    getIsAdmin: state => state.isAdmin
   },
   persist: true
 })

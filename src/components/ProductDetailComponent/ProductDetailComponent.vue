@@ -1,21 +1,21 @@
 <template>
   <div class="grid grid-cols-6 gap-5 p-5 bg-white ">
     <div class="col-span-2">
-      <img :src="product?.productImage" class="mb-5">
+      <img :src="product?.images[0]" class="mb-5">
       <swiper :slidesPerView="6" :spaceBetween="30" :freeMode="true" :pagination="{
         clickable: true,
       }" :modules="modules" class="mySwiper">
-        <swiper-slide v-for="smallImage in product?.productSmallImages">
+        <swiper-slide v-for="smallImage in product?.images">
           <img :src="smallImage">
         </swiper-slide>
       </swiper>
     </div>
     <div class="col-span-4">
-      <h3 class="text-2xl mb-5">{{ product?.title }}</h3>
+      <h3 class="text-2xl mb-5">{{ product?.name }}</h3>
       <div class="mb-5">
         <span class="text-base text-gray-500">
           {{ product?.rating }} <font-awesome-icon :icon="['fas', 'star']" class="text-yellow-500" /> | Đã Bán {{
-            product?.quantitySold }}
+            product?.selled }}
         </span>
       </div>
       <div class="bg-slate-100 py-4">
@@ -55,10 +55,10 @@ import { ref, onMounted } from 'vue';
 import { OrderProduct, Product } from '../../types/Product';
 import { FreeMode, Pagination } from 'swiper/modules';
 import { useRoute } from 'vue-router';
-import Logo from '../../assets/images/logo.png';
-import Test from '../../assets/images/test.webp';
 import axios from 'axios';
 import { useOrderStore } from '../../store/order';
+import { useNotifyStore } from '../../store/notification';
+import { numberWithCommas } from '../../util';
 
 const route = useRoute()
 
@@ -66,6 +66,7 @@ const modules = [FreeMode, Pagination];
 const product = ref<Product | null>(null);
 const orderProduct = ref<OrderProduct | null>(null);
 const orderStore = useOrderStore();
+const notifyStore = useNotifyStore();
 
 const fetchProduct = async () => {
   try {
@@ -75,17 +76,7 @@ const fetchProduct = async () => {
 
     if (data && data.data) {
       orderProduct.value = { ...data.data, amount: 0, selected: false }
-      product.value = {
-        id: data.data.id,
-        productImage: Test,
-        productSmallImages: [Test, Test, Test, Test],
-        logoImage: Logo,
-        brand: data.data.name,
-        price: data.data.price,
-        quantitySold: data.data.selled,
-        rating: data.data.rating,
-        title: data.data.name
-      };
+      product.value = data.data;
     }
   } catch (error) {
     console.error('Lỗi khi fetch dữ liệu:', error);
@@ -108,13 +99,10 @@ const handleIncreaseQuantity = () => {
   }
 }
 
-function numberWithCommas(x: number) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 const handleClickOrder = () => {
   if (orderProduct.value && orderProduct.value.amount > 0) {
     orderStore.addOrderProduct(orderProduct.value);
+    notifyStore.setShowNotify(false, 'Đã thêm sản phẩm vào giỏ hàng')
   }
 }
 

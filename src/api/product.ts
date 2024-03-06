@@ -41,18 +41,6 @@ export const getAllProducts = async (page: number, limit: number) => {
   }
 }
 
-export const getAllType = async () => {
-  try {
-    const response = await axios.get(`products/get-all-type`, {});
-
-    const data = response.data;
-
-    return data.data;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 export const createProduct = async (data: FormData) => {
   await axios
     .post('products', data, {

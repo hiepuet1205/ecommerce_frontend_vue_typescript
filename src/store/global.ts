@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
-export const useAdminStore = defineStore({
-  id: 'admin-store',
+export const useGlobalStore = defineStore({
+  id: 'global-store',
   state: () => {
     return {
       isShowModal: false,

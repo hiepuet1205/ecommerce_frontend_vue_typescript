@@ -2,7 +2,7 @@
   <BaseAdminPage>
     <template v-slot:content>
       <h1 class="text-2xl font-bold">Quản lý sản phẩm</h1>
-      <button class="border-2 border-inherit p-16 mt-5" @click="adminStore.setShowModal(true)">
+      <button class="border-2 border-inherit p-16 mt-5" @click="globalStore.setShowModal(true)">
         <font-awesome-icon :icon="['fas', 'plus']" class="text-9xl" />
       </button>
       <table class="w-full block whitespace-no-wrap overflow-x-scroll table-striped mt-5">
@@ -17,7 +17,6 @@
             <th class="px-6 py-3 text-gray-500 font-bold tracking-wider uppercase text-xs">Count In Stock</th>
             <th class="px-6 py-3 text-gray-500 font-bold tracking-wider uppercase text-xs">Selled</th>
             <th class="px-6 py-3 text-gray-500 font-bold tracking-wider uppercase text-xs">Description</th>
-            <th class="px-6 py-3 text-gray-500 font-bold tracking-wider uppercase text-xs">Discount</th>
             <th class="px-6 py-3 text-gray-500 font-bold tracking-wider uppercase text-xs">Actions</th>
           </tr>
         </thead>
@@ -28,7 +27,7 @@
                 <span class="text-gray-700 px-6 py-4 flex items-center">{{ product.id }}</span>
               </td>
               <td class="bg-white border-t px-4 py-2">
-                <img class="flex items-center rounded-full w-10 h-10" :src="product.image">
+                <img class="flex items-center rounded-full w-10 h-10" :src="product.images[0]">
               </td>
               <td class="bg-white border-t px-4 py-2">
                 <span class="text-gray-700 px-6 py-4 flex items-center">{{ product.name }}</span>
@@ -51,9 +50,6 @@
               <td class="bg-white border-t px-4 py-2">
                 <span class="text-gray-700 px-6 py-4 flex items-center">{{ product.description }}</span>
               </td>
-              <td class="bg-white border-t px-4 py-2">
-                <span class="text-gray-700 px-6 py-4 flex items-center">{{ product.discount }}%</span>
-              </td>
 
               <td class="bg-white border-t px-4 py-2">
                 <div class="flex">
@@ -73,11 +69,11 @@
       </div>
       <div
         class="rounded-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  z-20 mx-auto my-0 bg-white w-2/5"
-        v-if="adminStore.getIsShowModal">
+        v-if="globalStore.getIsShowModal">
         <div class="border-b-2 border-slate-400 p-8 relative">
           <h1 class="text-xl font-bold">{{ modalTitle }}</h1>
           <button class="absolute top-3 right-4 text-4xl text-slate-600"
-            @click="adminStore.setShowModal(false)">x</button>
+            @click="globalStore.setShowModal(false)">x</button>
         </div>
         <div class="px-8 pt-8 pb-20">
           <label>Name</label>
@@ -85,8 +81,12 @@
             class="w-full px-5 py-4 mb-3 placeholder:text-xl rounded-md input border-t-0 border-l-0 border-r-0 outline-none">
 
           <label>Type</label>
-          <input type="text" v-model.lazy="type"
-            class="w-full px-5 py-4 mb-3 placeholder:text-xl rounded-md input border-t-0 border-l-0 border-r-0 outline-none">
+          <!-- <input type="text" v-model.lazy="type"
+            class="w-full px-5 py-4 mb-3 placeholder:text-xl rounded-md input border-t-0 border-l-0 border-r-0 outline-none"> -->
+
+          <select v-model.lazy="type" class="w-full px-5 py-4 mb-3 placeholder:text-xl rounded-md input border-t-0 border-l-0 border-r-0 outline-none">
+            <option v-for="type in types" :key="type.name" :value="type.name">{{ type.name }}</option>
+          </select>
 
           <label>Price</label>
           <input type="number" v-model.lazy="price"
@@ -100,12 +100,8 @@
           <input type="text" v-model.lazy="description"
             class="w-full px-5 py-4 mb-3 placeholder:text-xl rounded-md input border-t-0 border-l-0 border-r-0 outline-none">
 
-          <label>Discount</label>
-          <input type="number" v-model.lazy="discount"
-            class="w-full px-5 py-4 mb-3 placeholder:text-xl rounded-md input border-t-0 border-l-0 border-r-0 outline-none">
-
-          <label>Image</label>
-          <input type="file" @change="handleFileChange"
+          <label>images</label>
+          <input type="file" multiple @change="handleFileChange"
             class="w-full px-5 py-4 mb-3 placeholder:text-xl rounded-md input border-t-0 border-l-0 border-r-0 outline-none">
 
           <button class="text-white bg-sky-600 rounded-xl px-5 py-3 text-xl float-right"
@@ -118,13 +114,15 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useAdminStore } from '../../../store/admin';
+import { useGlobalStore } from '../../../store/global';
 import BaseAdminPage from '../BaseAdminPage.vue';
 import { useRouter } from 'vue-router';
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from '../../../api/product';
-import { ProductData } from '../../../types/Product';
+import { Product, Type } from '../../../types/Product';
+import { getAllType } from '../../../api/type';
 
-const products = ref<Array<ProductData>>([]);
+const products = ref<Array<Product>>([]);
+const types = ref<Array<Type>>([]);
 const page = ref(1);
 const limit = 10;
 const isLoading = ref(false);
@@ -150,6 +148,7 @@ const fetchProducts = async () => {
 };
 onMounted(async () => {
   products.value = await fetchProducts();
+  types.value = await getAllType();
 })
 
 const handleClickSeeMore = async () => {
@@ -159,16 +158,15 @@ const handleClickSeeMore = async () => {
   }
 }
 
-const adminStore = useAdminStore();
+const globalStore = useGlobalStore();
 
 const id = ref<number>(-1)
 const name = ref<string | undefined>('')
-const image = ref<File | null>(null)
+const images = ref<File[] | null>(null)
 const type = ref<string | undefined>('')
 const price = ref<number | undefined>(0)
 const countInStock = ref<number | undefined>(0)
 const description = ref<string | undefined>('')
-const discount = ref<number | undefined>(0)
 
 
 const handleFileChange = (event: Event) => {
@@ -176,7 +174,7 @@ const handleFileChange = (event: Event) => {
   const files = target.files;
 
   if (files && files.length > 0) {
-    image.value = files[0];
+    images.value = Array.from(files);
   }
 };
 
@@ -184,13 +182,16 @@ const router = useRouter();
 
 const handleClickSubmit = async () => {
   const formData = new FormData();
-  if (image.value && name.value && type.value && price.value && countInStock.value && description.value && discount.value) {
-    formData.append('image', image.value);
+  if (images.value && name.value && type.value && price.value && countInStock.value && description.value) {
+    images.value.forEach((file) => {
+      formData.append('image', file);
+    });
+    
     formData.append('name', name.value);
     formData.append('price', String(price.value));
+    formData.append('type', String(type.value));
     formData.append('countInStock', String(countInStock.value));
     formData.append('description', description.value);
-    formData.append('discount', String(discount.value));
 
     try {
       if (isUpdate.value) {
@@ -213,9 +214,9 @@ const handleClickDelete = async (id: number) => {
   }
 }
 
-const handleClickUpdate = async (product: ProductData) => {
+const handleClickUpdate = async (product: Product) => {
   isUpdate.value = true
-  adminStore.setShowModal(true)
+  globalStore.setShowModal(true)
 
   id.value = product.id
   name.value = product.name
@@ -223,7 +224,6 @@ const handleClickUpdate = async (product: ProductData) => {
   price.value = product.price
   countInStock.value = product.countInStock
   description.value = product.description
-  discount.value = product.discount
 }
 </script>
 

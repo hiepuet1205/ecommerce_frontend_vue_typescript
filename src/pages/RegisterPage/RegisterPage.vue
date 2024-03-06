@@ -20,13 +20,26 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Login from '../../assets/images/login.png';
+import { signup } from '../../api/auth';
 
 const email = ref('');
 const password = ref('');
 const passwordConfirm = ref('');
+const router = useRouter();
 
-const handleSubmit = () => {
-  console.log(email.value, password.value, passwordConfirm.value);
+const handleSubmit = async () => {
+  if (password.value!== passwordConfirm.value) {
+    alert('Mật khẩu không trùng khớp');
+    return;
+  }
+
+  if (email.value === '' || password.value === '' || passwordConfirm.value === '') {
+    alert('Vui lòng nhập đầy đủ thông tin');
+    return;
+  }
+
+  await signup(email.value, password.value);
+  router.push({ name: 'LoginPage' });
 }
 </script>
 

@@ -7,6 +7,7 @@ export interface User {
   address?: string,
   city?: string,
   role: string,
+  isAdmin?: boolean,
   createdAt?: string,
   updatedAt?: string,
 }

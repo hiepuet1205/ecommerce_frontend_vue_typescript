@@ -87,3 +87,40 @@ export const deleteUser = async (id: number) => {
       console.error('Delete error!', error);
     });
 }
+
+export const forgotPassword = async (email: string) => {
+  await axios
+    .post('users/forgot-password', { email })
+    .then(response => {
+      console.log('Successfully!', response);
+    })
+    .catch(error => {
+      console.error('Error!', error);
+    });
+}
+
+export const resetPassword = async (token: string, password: string) => {
+  await axios
+    .patch(`users/reset-password/${token}`, { password })
+    .then(response => {
+      console.log('Successfully!', response);
+    })
+    .catch(error => {
+      console.error('Error!', error);
+    });
+}
+
+export const updatePassword = async (oldPassword: string, newPassword: string, passwordConfirm: string) => {
+  await axios
+    .put(`users/update-password`, { oldPassword, newPassword, passwordConfirm }, {
+      headers: {
+        'Authorization': `Bearer ${authStore.getToken}`
+      },
+    })
+    .then(response => {
+      console.log('Successfully!', response);
+    })
+    .catch(error => {
+      console.error('Error!', error);
+    });
+}

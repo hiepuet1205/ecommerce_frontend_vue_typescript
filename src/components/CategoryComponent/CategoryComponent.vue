@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { getAllType } from '../../api/product';
+import { getAllType } from '../../api/type'
 
 const types = ref<Array<string>>([])
 const visibleCategories = ref(Array(types.value.length).fill(false));
@@ -36,7 +36,8 @@ const handleClickCategory = (index: number) => {
 
 
 onMounted(async () => {
-  types.value = await getAllType();
+  const data = await getAllType();
+  types.value = data.map((type: { name: any; }) => type.name);
 })
 </script>
 

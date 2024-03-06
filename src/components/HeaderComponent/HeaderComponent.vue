@@ -27,12 +27,22 @@
             <div v-else class="info">
               <img :src="userStore.getUser?.avatar" class="rounded-full w-12 h-12 mr-1">
               <div class="popup hidden">
-                <div class="absolute traingle"></div>
-                <div class="absolute bg-white top-16 shadow-lg rounded-md popup_details">
+                <div class="absolute traingle z-10"></div>
+                <div class="absolute bg-white top-16 shadow-lg rounded-md popup_details z-10">
                   <ul class="text-black w-52">
                     <li class="p-5 hover:bg-slate-200">
                       <router-link to="/profile" class="flex">
                         Tài Khoản
+                      </router-link>
+                    </li>
+                    <li class="p-5 hover:bg-slate-200">
+                      <router-link to="/update-password" class="flex">
+                        Đổi Mật Khẩu
+                      </router-link>
+                    </li>
+                    <li class="p-5 hover:bg-slate-200">
+                      <router-link to="/order/success" class="flex">
+                        Đơn Hàng
                       </router-link>
                     </li>
                     <li class="p-5 hover:bg-slate-200" @click="handleLogout">
@@ -42,9 +52,12 @@
                 </div>
               </div>
             </div>
-            <div>
+            <div class="relative">
               <router-link to="/order">
-                <font-awesome-icon :icon="['fas', 'cart-shopping']" class="text-3xl" />
+                <font-awesome-icon :icon="['fas', 'cart-shopping']" class="text-3xl mr-3" />
+                <span
+                  class="text-center quantityItemOrder bg-red-500 border-2 border-white absolute left-5 rounded-full w-7">{{
+                    orderStore.getOrderItems.length }}</span>
                 Giỏ Hàng
               </router-link>
             </div>
@@ -63,15 +76,22 @@ import { useRouter } from 'vue-router';
 import { User } from '../../types/User';
 import { getInfo } from '../../api/user';
 import { logout } from '../../api/auth';
+import { useAddressStore } from '../../store/address';
+import { useOrderStore } from '../../store/order';
 
 const authStore = useAuthStore();
 const userStore = useUserStore();
+const addressStore = useAddressStore();
+const orderStore = useOrderStore();
 const router = useRouter();
 
 onMounted(async () => {
   if (authStore.getIsAuthenticated) {
     const user: User = await getInfo();
     userStore.setUser(user);
+    console.log(user)
+    authStore.setIsAdmin(user.isAdmin as boolean);
+    addressStore.setAddress(user.name, user.address || '', user.city || '', user.phone || '')
   }
 });
 
@@ -97,5 +117,9 @@ const handleLogout = async () => {
 
 .popup_details {
   left: -10px;
+}
+
+.quantityItemOrder {
+  top: -10px;
 }
 </style>
