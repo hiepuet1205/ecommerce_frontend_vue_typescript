@@ -21,6 +21,7 @@
 import { ref } from 'vue';
 import Login from '../../assets/images/login.png';
 import { signup } from '../../api/auth';
+import { useRouter } from 'vue-router';
 
 const email = ref('');
 const password = ref('');
